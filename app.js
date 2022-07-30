@@ -1,19 +1,35 @@
 const oss = require('./api/oss')
 const async = require('async')
 
-// oss.getUserData(1)
+// let targetArray = Array.from({length: 800000}, (x, i) => i + 20000 );
 
-// try 1 - 100.000
-// for (let i = 1; i < 10000; i++) {
-//     oss.getUserData(i)
+// async.eachLimit(targetArray, 150, (userId, callback) => {
+//     oss.getUserData(userId, callback)
+// })
+
+// do 5000 then rest 30 sec
+
+function delay (ms) {
+    return new Promise((resolve,reject) => setTimeout(resolve,ms));
+}
+
+
+async function doReq(beginAt, batchAmount, end, batchDelay, paralelLimit) {
+    let range = Array.from({length: batchAmount}, (x, i) => i + beginAt );
+    // console.log(range)
+
+    await async.eachLimit(range, paralelLimit, (userId, callback) => {
+        oss.getUserData(userId, callback)
+    })
+
+    if ((beginAt + batchAmount) < end) {
+        console.log(`sleep for ${batchDelay} sec | end: ${beginAt + batchAmount}`)
+        await delay(batchDelay * 1000)
+        doReq(beginAt + batchAmount, batchAmount, end, batchDelay, paralelLimit)
+    } else {
+        console.log(`finished at ${beginAt + batchAmount}`)
+    }
     
-// }
+}
 
-// 1 - 1000
-let targetArray = Array.from({length: 10000}, (x, i) => i + 1 );
-
-async.eachLimit(targetArray, 10, (userId, callback) => {
-    oss.getUserData(userId, callback)
-})
-
-console.log(targetArray)
+doReq(10000, 10, 10100, 10, 2)
