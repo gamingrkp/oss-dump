@@ -19,7 +19,7 @@ async function doReq(beginAt, batchAmount, end, batchDelay, paralelLimit) {
     // console.log(range)
 
     await async.eachLimit(range, paralelLimit, (userId, callback) => {
-        oss.getUserData(userId, callback)
+        oss.getUserData(userId, callback, 'normal')
     })
 
     if ((beginAt + batchAmount) < end) {
@@ -32,4 +32,4 @@ async function doReq(beginAt, batchAmount, end, batchDelay, paralelLimit) {
     
 }
 
-doReq(10000, 10, 10100, 10, 2)
+doReq(1010000, 5000, 1500000, 30, 50)

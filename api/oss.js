@@ -1,7 +1,7 @@
 var axios = require("axios");
 const fs = require('fs');
 
-async function getUserData(userId, callback) {
+async function getUserData(userId, callback, mode) {
 	var options = {
 		method: 'POST',
 		url: 'https://api-prd.oss.go.id/v1/izin/main/getDetailPermohonan',
@@ -29,7 +29,14 @@ async function getUserData(userId, callback) {
 		const response = await axios.request(options);
 		callback();
 		if (response.data.status == 200) {
-			console.log(`Success ${userId}: ${response.data.data.dataProfile.nama}`);
+      if (mode == 'debug') {
+        console.log(`[debug] Success ${userId}: ${response.data.data.dataProfile.nama}`);
+      } else {
+        if (userId % 100 == 0) {
+          console.log(`[each 100]Success ${userId}: ${response.data.data.dataProfile.nama}`);
+        }
+      }
+			
 
 			// Write to file
 			let toWrite = response.data.data
